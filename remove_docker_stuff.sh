@@ -1,0 +1,3 @@
+docker stop kitchen_container
+docker rm kitchen_container
+docker rmi kitchen_image

@@ -32,7 +32,7 @@ func (KitchenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 //	return result
 //}
 
-const diningHallPort = ":8080"
+const diningHallPort = ":7500"
 const kitchenServerPort = ":8000"
 
 func main() {
@@ -40,7 +40,7 @@ func main() {
 	kitchenServer.Addr = kitchenServerPort
 	kitchenServer.Handler = KitchenHandler{}
 
-	fmt.Println("Kitchen is listening and serving")
+	fmt.Println("Kitchen is listening and serving on port:"+kitchenServerPort)
 	if err := kitchenServer.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
