@@ -3,6 +3,8 @@ This is the kitchen part of the Restaurant simulation of the first lab at the Ne
 
 The dining hall part of the Restaurant simulation: https://github.com/GheorgheMorari/DiningHallServerGO
 # Docker stuff:
+If you don't run linux, or don't have git bash, change the file type of the scripts to cmd.
+
 run build_and_start_container.sh to build and start container
 
 run start_server_from_container.sh to start or restart server
@@ -11,7 +13,7 @@ run build_docker_image.sh to build the image
 
 run remove_docker_stuff.sh to remove docker image and container
 # View in browser addresses:
-localhost:8000/ to check if the kitchen server is running
+http://localhost:8000/ to check if the kitchen server is running, and to see how many requests did the kitchen server receive
 
 # The kitchen system architecture:
 
