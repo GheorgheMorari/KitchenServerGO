@@ -1,12 +1,23 @@
 # KitchenServerGo
 This is the kitchen part of the Restaurant simulation of the first lab at the Network Programming course.
-The dining hall part of the Restaurant simulation: https://github.com/GheorgheMorari/DiningHallServerGO
 
-The kitchen system architecture:
+The dining hall part of the Restaurant simulation: https://github.com/GheorgheMorari/DiningHallServerGO
+# Docker stuff:
+run build_and_start_container.sh to build and start container
+
+run start_server_from_container.sh to start or restart server
+
+run build_docker_image.sh to build the image
+
+run remove_docker_stuff.sh to remove docker image and container
+# View in browser addresses:
+localhost:8000/ to check if the kitchen server is running
+
+# The kitchen system architecture:
 
 ![image](https://user-images.githubusercontent.com/53918731/134770818-6633d952-f083-4747-b49c-1133950b27ed.png)
 
-The communication protocol:
+# The communication protocol:
 
 Sending:
 
