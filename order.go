@@ -1,11 +1,23 @@
 package main
 
 type Order struct {
-	Id      int `json:"id"`
-	TableId int `json:"table_id"`
-	WaiterId int   `json:"waiter_id"`
-	Items    []int `json:"items"`
-	Priority   int   `json:"priority"`
-	MaxWait    int   `json:"max_wait"`
-	PickUpTime int64 `json:"pick_up_time"`
+	mealCounter int
+	priority    int
+	pickUpTime  int64
+	maxWait     int
+	mealList    []*Meal
+}
+
+func parseOrder(order PostOrder) Order {
+	var ret Order
+	ret.mealCounter = 0
+	ret.priority = order.Priority
+	ret.pickUpTime = order.PickUpTime
+	ret.maxWait = order.MaxWait
+	for _, id := range order.Items {
+		ret.mealCounter += 1
+		meal := newMeal(&ret,id)
+		ret.mealList = append(ret.mealList, meal)
+	}
+	return ret
 }
