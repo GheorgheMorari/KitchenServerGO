@@ -9,9 +9,9 @@ const kitchenServerHost = "http://localhost"
 const diningHallPort = ":7500"
 const kitchenServerPort = ":8000"
 
-const cook_n = 3
-const oven_n = 2
-const stove_n = 2
+const cookN = 3
+const ovenN = 2
+const stoveN = 2
 
 var kitchen Kitchen
 func main() {

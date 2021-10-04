@@ -1,6 +1,9 @@
 package main
 
 type Order struct {
+	id          int
+	tableId     int
+	items       []int
 	mealCounter int
 	priority    int
 	pickUpTime  int64
@@ -8,16 +11,29 @@ type Order struct {
 	mealList    []*Meal
 }
 
-func parseOrder(order PostOrder) Order {
+func parseOrder(postOrder PostOrder) Order {
 	var ret Order
+	ret.id = postOrder.Id
+	ret.tableId = postOrder.TableId
+	ret.items = postOrder.Items
 	ret.mealCounter = 0
-	ret.priority = order.Priority
-	ret.pickUpTime = order.PickUpTime
-	ret.maxWait = order.MaxWait
-	for _, id := range order.Items {
+	ret.priority = postOrder.Priority
+	ret.pickUpTime = postOrder.PickUpTime
+	ret.maxWait = postOrder.MaxWait
+	for _, id := range postOrder.Items {
 		ret.mealCounter += 1
-		meal := newMeal(&ret,id)
+		meal := newMeal(&ret, id)
 		ret.mealList = append(ret.mealList, meal)
 	}
 	return ret
+}
+
+func (order Order) isReady() bool {
+	//TODO use meal counter for determining if the order has been completed
+	for _, meal := range order.mealList {
+		if meal.prepared != 1 {
+			return false
+		}
+	}
+	return true
 }

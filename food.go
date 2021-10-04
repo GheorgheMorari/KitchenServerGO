@@ -20,3 +20,4 @@ var aubergine = Food{7,"Aubergine",20,2, ""}
 var lasagna = Food{8,"Lasagna",30,2, "oven"}
 var burger = Food{9,"Burger",15,1, "oven"}
 var gyros = Food{10,"Gyros",15,1, ""}
+

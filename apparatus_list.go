@@ -3,7 +3,6 @@ package main
 import (
 	"math"
 	"sync/atomic"
-	"time"
 	"unsafe"
 )
 
@@ -36,7 +35,7 @@ func newApparatus(numOfApparatus int) ApparatusList {
 	return ret
 }
 
-func (appaList ApparatusList)useApparatus(meal *Meal, now int64){
+func (appaList ApparatusList)useApparatus(cook Cook, meal *Meal, now int64){
 
 	appa := &appaList.list[0]
 	minWait := math.MaxInt32
@@ -59,7 +58,7 @@ func (appaList ApparatusList)useApparatus(meal *Meal, now int64){
 	appa.mx.Lock()
 	atomic.StoreInt32(&appa.busy,1)
 	atomic.StorePointer((*unsafe.Pointer)(unsafe.Pointer(appa.meal)), unsafe.Pointer(meal))
-	time.Sleep(time.Duration(meal.timeRequired) * time.Second)
+	meal.prepare(cook)
 	atomic.StoreInt32(&appa.busy,0)
 	appa.mx.Unlock()
 }
