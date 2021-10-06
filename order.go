@@ -4,15 +4,15 @@ type Order struct {
 	id          int
 	tableId     int
 	items       []int
-	mealCounter int
+	mealCounter int32
 	priority    int
 	pickUpTime  int64
 	maxWait     int
 	mealList    []*Meal
 }
 
-func parseOrder(postOrder PostOrder) Order {
-	var ret Order
+func parseOrder(postOrder *PostOrder) *Order {
+	ret := new(Order)
 	ret.id = postOrder.Id
 	ret.tableId = postOrder.TableId
 	ret.items = postOrder.Items
@@ -22,18 +22,15 @@ func parseOrder(postOrder PostOrder) Order {
 	ret.maxWait = postOrder.MaxWait
 	for _, id := range postOrder.Items {
 		ret.mealCounter += 1
-		meal := newMeal(&ret, id)
+		meal := newMeal(ret, id)
 		ret.mealList = append(ret.mealList, meal)
 	}
 	return ret
 }
 
 func (order Order) isReady() bool {
-	//TODO use meal counter for determining if the order has been completed
-	for _, meal := range order.mealList {
-		if meal.prepared != 1 {
-			return false
-		}
+	if order.mealCounter != 0 {
+		return false
 	}
 	return true
 }
