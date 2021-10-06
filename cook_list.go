@@ -7,19 +7,19 @@ type CookList struct {
 	cookIdCounter int
 }
 
-func (c CookList) start() {
-	c.cookIdCounter = 0
+func (cl CookList) start() {
+	cl.cookIdCounter = 0
 	for i := 0; i < cookN; i++ {
 		randomCook := cookPersonas[rand.Intn(len(cookPersonas))]
-		randomCook.id = c.cookIdCounter
-		c.cookIdCounter++
+		randomCook.id = cl.cookIdCounter
+		cl.cookIdCounter++
 		if i == 0 {
 			randomCook.rank = 3
 		}
-		c.cookList = append(c.cookList, randomCook)
+		cl.cookList = append(cl.cookList, randomCook)
 	}
 
-	for _, cook := range c.cookList {
+	for _, cook := range cl.cookList {
 		go cook.startWorking()
 	}
 }

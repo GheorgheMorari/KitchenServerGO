@@ -23,8 +23,8 @@ func newDelivery(order *Order) *Delivery {
 	ret.PickUpTime = order.pickUpTime
 	ret.CookingTime = int(time.Now().Unix() - order.pickUpTime)
 	var cookingDetails []MealDelivery
-	for _, meal := range order.mealList{
-		cookingDetails = append(cookingDetails, MealDelivery{meal.foodId,meal.cookId})
+	for _, meal := range order.mealList {
+		cookingDetails = append(cookingDetails, MealDelivery{meal.foodId, meal.cookId})
 	}
 	ret.CookingDetails = cookingDetails
 	return ret

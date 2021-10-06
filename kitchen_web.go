@@ -10,23 +10,23 @@ import (
 )
 
 type KitchenWeb struct {
-	kitchenServer http.Server
-	orderHandler  OrderHandler
-	kitchenClient http.Client
+	kitchenServer  http.Server
+	kitchenHandler KitchenHandler
+	kitchenClient  http.Client
 }
 
-func (kweb *KitchenWeb) start() {
-	kweb.kitchenServer.Addr = kitchenServerPort
-	kweb.kitchenServer.Handler = &kweb.orderHandler
+func (kw *KitchenWeb) start() {
+	kw.kitchenServer.Addr = kitchenServerPort
+	kw.kitchenServer.Handler = &kw.kitchenHandler
 
 	fmt.Println(time.Now())
 	fmt.Println("Kitchen is listening and serving on port" + kitchenServerPort)
-	if err := kweb.kitchenServer.ListenAndServe(); err != nil {
+	if err := kw.kitchenServer.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func (kweb *KitchenWeb) deliver(delivery *Delivery) {
+func (kw *KitchenWeb) deliver(delivery *Delivery) {
 
 	requestBody, marshallErr := json.Marshal(delivery)
 	if marshallErr != nil {
@@ -37,10 +37,27 @@ func (kweb *KitchenWeb) deliver(delivery *Delivery) {
 	if newRequestError != nil {
 		fmt.Println("Could not create new request. Error:", newRequestError)
 	} else {
-		_, doError := kweb.kitchenClient.Do(request)
+		_, doError := kw.kitchenClient.Do(request)
 		if doError != nil {
 			fmt.Println("ERROR Sending request. ERR:",doError)
 			return
 		}
 	}
+}
+
+func (kw *KitchenWeb) establishConnection() bool {
+	if kitchen.connected == true {
+		return false
+	}
+	request, _ := http.NewRequest(http.MethodConnect, diningHallHost+diningHallPort+"/", bytes.NewBuffer([]byte{}))
+	response, err := kw.kitchenClient.Do(request)
+	if err != nil {
+		return false
+	}
+	var responseBody = make([]byte, response.ContentLength)
+	response.Body.Read(responseBody)
+	if string(responseBody) != "OK" {
+		return false
+	}
+	return true
 }

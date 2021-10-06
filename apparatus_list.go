@@ -11,10 +11,10 @@ type ApparatusList struct {
 	list []Apparatus
 }
 
-func (appaList ApparatusList) getTimeLeft(now int64) int {
+func (al ApparatusList) getTimeLeft(now int64) int {
 	minWait := math.MaxInt32
-	for i , _ := range appaList.list {
-		appa := &appaList.list[i]
+	for i , _ := range al.list {
+		appa := &al.list[i]
 		if appa.busy == 0 {
 			return 0
 		}
@@ -35,14 +35,14 @@ func newApparatus(numOfApparatus int) ApparatusList {
 	return ret
 }
 
-func (appaList ApparatusList)useApparatus(cook Cook, meal *Meal, now int64){
+func (al ApparatusList)useApparatus(cook Cook, meal *Meal, now int64){
 
-	appa := &appaList.list[0]
+	appa := &al.list[0]
 	minWait := math.MaxInt32
 
 	//Get the first oven to finish
-	for i , _ := range appaList.list {
-		loopAppa := &appaList.list[i]
+	for i , _ := range al.list {
+		loopAppa := &al.list[i]
 		if loopAppa.busy == 0 {
 			minWait = 0
 			appa = loopAppa

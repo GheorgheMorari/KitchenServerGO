@@ -3,8 +3,6 @@ package main
 import "os"
 
 var diningHallHost = "http://localhost"
-const kitchenServerHost = "http://localhost"
-
 
 const diningHallPort = ":7500"
 const kitchenServerPort = ":8000"
