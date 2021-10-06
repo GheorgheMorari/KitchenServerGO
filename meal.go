@@ -32,6 +32,7 @@ func (m Meal) getTimeLeft(now int64) int {
 func (m *Meal) prepare(cook Cook) {
 	atomic.StoreInt32(&m.busy, 1)
 	atomic.StoreInt64(&m.preparingTime, time.Now().Unix())
+	atomic.AddInt32(&m.parent.mealCounter, -1)
 	m.cookId = cook.id
 	time.Sleep(time.Duration(m.timeRequired) * time.Second)
 	atomic.StoreInt32(&m.prepared, 1)
