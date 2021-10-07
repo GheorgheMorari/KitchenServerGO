@@ -3,22 +3,27 @@ package main
 import "math/rand"
 
 type CookList struct {
-	cookList      []Cook
+	cookList      []*Cook
 	cookIdCounter int
 }
 
-func (cl CookList) start() {
-	cl.cookIdCounter = 0
+func NewCookList() *CookList {
+	ret := new(CookList)
+	ret.cookIdCounter = 0
 	for i := 0; i < cookN; i++ {
 		randomCook := cookPersonas[rand.Intn(len(cookPersonas))]
-		randomCook.id = cl.cookIdCounter
-		cl.cookIdCounter++
+		randomCook.id = ret.cookIdCounter
+		ret.cookIdCounter++
 		if i == 0 {
 			randomCook.rank = 3
 		}
-		cl.cookList = append(cl.cookList, randomCook)
+		ret.cookList = append(ret.cookList, NewCook(&randomCook))
 	}
+	return ret
+}
 
+
+func (cl CookList) start() {
 	for _, cook := range cl.cookList {
 		go cook.startWorking()
 	}

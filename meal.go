@@ -1,7 +1,7 @@
 package main
 
 import (
-	"sync/atomic"
+	"sync"
 	"time"
 )
 
@@ -15,9 +15,10 @@ type Meal struct {
 	foodId        int
 	cookId        int
 	parent        *Order
+	valueMutex    sync.Mutex
 }
 
-func (m Meal) getTimeLeft(now int64) int {
+func (m *Meal) getTimeLeft(now int64) int {
 	//now := time.Now().Unix()
 	if m.busy == 1 {
 		elapsed := int(now - m.preparingTime)
@@ -29,16 +30,53 @@ func (m Meal) getTimeLeft(now int64) int {
 	return limit - elapsed - m.timeRequired - priority
 }
 
-func (m *Meal) prepare(cook Cook) {
-	atomic.StoreInt32(&m.busy, 1)
-	atomic.StoreInt64(&m.preparingTime, time.Now().Unix())
-	atomic.AddInt32(&m.parent.mealCounter, -1)
-	m.cookId = cook.id
+func (m *Meal) get() *Meal {
+	m.valueMutex.Lock()
+	defer m.valueMutex.Unlock()
+	return m
+}
+
+func (m *Meal) set(meal *Meal){
+	m.valueMutex.Lock()
+	defer m.valueMutex.Unlock()
+	m.parent = meal.parent
+	m.busy = meal.busy
+	m.prepared = meal.prepared
+}
+
+func (m *Meal) getBusyMeal() *Meal {
+	m.busy = 1
+	return m
+}
+
+func (m *Meal) prepare(cook *Cook, now int64) {
+	writeMeal := m.get()
+	if writeMeal.prepared == 1 {
+		return
+	}
+
+	writeMeal.busy = 1
+	writeMeal.preparingTime = now
+	writeMeal.cookId = cook.id
+	m.set(writeMeal)
 	time.Sleep(time.Duration(m.timeRequired) * time.Second)
-	atomic.StoreInt32(&m.prepared, 1)
-	atomic.StoreInt32(&m.busy, 0)
+	writeMeal.busy = 1
+	writeMeal.prepared = 1
+	writeMeal.parent.mealCounter -= 1
+	m.set(writeMeal)
 }
 func newMeal(parent *Order, id int) *Meal {
 	food := menu[id]
-	return &Meal{0, 0, food.preparationTime, food.complexity, apparatus[food.cookingApparatus], 0, id, -1, parent}
+	return &Meal{
+		prepared:      0,
+		busy:          0,
+		timeRequired:  food.preparationTime,
+		complexity:    food.complexity,
+		apparatus:     apparatusToId[food.cookingApparatus],
+		preparingTime: 0,
+		foodId:        id,
+		cookId:        -1,
+		parent:        parent,
+		valueMutex:    sync.Mutex{},
+	}
 }

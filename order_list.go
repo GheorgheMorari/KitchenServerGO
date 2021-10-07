@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -28,24 +29,29 @@ type OrderList struct {
 	orderArr      []*Order
 }
 
-func (orderList *OrderList) getArray(meal *Meal) *[]*Meal {
-	apparatusId := meal.apparatus
-	switch apparatusId {
-	case 0:
-		return &orderList.nilList
-	case 1:
-		return &orderList.ovenList
-	case 2:
-		return &orderList.stoveList
-	}
-	return nil
+func NewOrderList() *OrderList {
+	ret := new(OrderList)
+	ret.deliveryMutex = sync.Mutex{}
+	ret.mealMutex = sync.Mutex{}
+	ret.ovenList = []*Meal{}
+	ret.stoveList = []*Meal{}
+	ret.nilList = []*Meal{}
+	ret.orderArr = []*Order{}
+	return ret
 }
 
 func (orderList *OrderList) addOrder(order *Order) {
 	orderList.orderArr = append(orderList.orderArr, order)
 	for _, meal := range order.mealList {
-		arr := *orderList.getArray(meal)
-		arr = append(arr, meal)
+		apparatusId := meal.apparatus
+		switch apparatusId {
+		case 0:
+			orderList.nilList = append(orderList.nilList, meal)
+		case 1:
+			orderList.ovenList = append(orderList.ovenList, meal)
+		case 2:
+			orderList.stoveList = append(orderList.stoveList, meal)
+		}
 	}
 }
 
@@ -57,8 +63,15 @@ func (orderList *OrderList) getDelivery() *Delivery {
 	for i, order := range orderList.orderArr {
 		if order.isReady() {
 			for _, meal := range order.mealList {
-				arr := orderList.getArray(meal)
-				removeFromArr(arr, meal)
+				apparatusId := meal.apparatus
+				switch apparatusId {
+				case 0:
+					removeFromArr(&orderList.nilList, meal)
+				case 1:
+					removeFromArr(&orderList.ovenList, meal)
+				case 2:
+					removeFromArr(&orderList.stoveList, meal)
+				}
 			}
 			orderList.orderArr = append(orderList.orderArr[:i], orderList.orderArr[i+1:]...)
 			return newDelivery(order)
@@ -67,42 +80,61 @@ func (orderList *OrderList) getDelivery() *Delivery {
 	return nil
 }
 
-func (orderList *OrderList) getMeal(cook Cook) *Meal {
+func (orderList *OrderList) getMeal(cook *Cook) *Meal {
 	//Prevent threads from taking the same meal
 	orderList.mealMutex.Lock()
 	defer orderList.mealMutex.Unlock()
 
 	now := time.Now().Unix()
-	overallMin := math.MaxInt32
-	var ret *Meal = nil
+	overallMin := math.MaxInt64
+	var ret *Meal //TODO make higher rank cooks take the higher orders first
 	ovenTimeLeft := kitchen.ovens.getTimeLeft(now)
 	for _, meal := range orderList.ovenList {
-		if meal.complexity <= cook.rank {
-			timeLeft := meal.getTimeLeft(now) + ovenTimeLeft
+		readMeal := meal.get()
+		if readMeal.prepared == 0 && readMeal.busy == 0 && readMeal.complexity <= cook.rank {
+			timeLeft := readMeal.getTimeLeft(now) + ovenTimeLeft
 			if overallMin > timeLeft {
 				overallMin = timeLeft
-				ret = meal
+				ret = readMeal
 			}
 		}
 	}
-	stoveTimeLeft := kitchen.ovens.getTimeLeft(now)
+	stoveTimeLeft := kitchen.stoves.getTimeLeft(now)
 	for _, meal := range orderList.stoveList {
-		if meal.complexity <= cook.rank {
-			timeLeft := meal.getTimeLeft(now) + stoveTimeLeft
+		readMeal := meal.get()
+		if readMeal.prepared == 0 && readMeal.busy == 0 && readMeal.complexity <= cook.rank {
+			timeLeft := readMeal.getTimeLeft(now) + stoveTimeLeft
 			if overallMin > timeLeft {
 				overallMin = timeLeft
-				ret = meal
+				ret = readMeal
 			}
 		}
 	}
 	for _, meal := range orderList.nilList {
-		if meal.complexity <= cook.rank {
-			timeLeft := meal.getTimeLeft(now)
+		readMeal := meal.get()
+		if readMeal.prepared == 0 && readMeal.busy == 0 && readMeal.complexity <= cook.rank {
+			timeLeft := readMeal.getTimeLeft(now)
 			if overallMin > timeLeft {
 				overallMin = timeLeft
-				ret = meal
+				ret = readMeal
 			}
 		}
+	}
+
+	if ret != nil {
+		return ret.get()
+	}
+
+	return ret
+}
+
+func (orderList *OrderList) getStatus() string {
+	var ret string
+
+	now := time.Now().Unix() //TODO show status with buffered spaces
+	for _, order := range orderList.orderArr {
+		ret += makeDiv("Order id:" + strconv.Itoa(order.id) + " Meals to prepare:" + strconv.Itoa(int(order.mealCounter)) +
+			" Time passed:" + strconv.Itoa(int(now-order.pickUpTime)) + " Max wait:" + strconv.Itoa(order.maxWait))
 	}
 	return ret
 }

@@ -10,9 +10,10 @@ import (
 )
 
 type KitchenWeb struct {
-	kitchenServer  http.Server
-	kitchenHandler KitchenHandler
-	kitchenClient  http.Client
+	kitchenServer   http.Server
+	kitchenHandler  KitchenHandler
+	kitchenClient   http.Client
+	connectionError error
 }
 
 func (kw *KitchenWeb) start() {
@@ -52,6 +53,7 @@ func (kw *KitchenWeb) establishConnection() bool {
 	request, _ := http.NewRequest(http.MethodConnect, diningHallHost+diningHallPort+"/", bytes.NewBuffer([]byte{}))
 	response, err := kw.kitchenClient.Do(request)
 	if err != nil {
+		kw.connectionError = err
 		return false
 	}
 	var responseBody = make([]byte, response.ContentLength)
