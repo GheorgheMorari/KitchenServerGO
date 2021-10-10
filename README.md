@@ -13,7 +13,7 @@ run build_docker_image.sh to build the image
 
 run remove_docker_stuff.sh to remove docker image and container
 # View in browser addresses:
-http://localhost:8000/ to check if the kitchen server is running, and to see how many requests did the kitchen server receive
+http://localhost:8000/ to check if the kitchen server is running, and to see the state of the kitchen
 
 # The kitchen system architecture:
 
