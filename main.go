@@ -6,10 +6,10 @@ var diningHallHost = "http://localhost"
 
 const diningHallPort = ":7500"
 const kitchenServerPort = ":8000"
-
-const cookN = 10
-const ovenN = 10
-const stoveN = 10
+//todo fix multiple delivery problemd
+const cookN = 4
+const ovenN = 2
+const stoveN = 1
 
 var kitchen Kitchen
 func main() {

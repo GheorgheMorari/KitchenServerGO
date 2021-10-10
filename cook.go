@@ -59,10 +59,14 @@ func (c *Cook) startWorking() {
 				meal.prepare(c, now)
 			case 1:
 				c.apparatusType = 1
-				kitchen.ovens.useApparatus(c, meal, now)
+				apparatus , waitApparatus := kitchen.ovens.getApparatusAndWait(now)
+				c.timeRequired += waitApparatus
+				apparatus.useApparatus(c,meal,now)
 			case 2:
 				c.apparatusType = 2
-				kitchen.stoves.useApparatus(c, meal, now)
+				apparatus , waitApparatus := kitchen.stoves.getApparatusAndWait(now)
+				c.timeRequired += waitApparatus
+				apparatus.useApparatus(c,meal,now)
 			}
 		}
 		delivery := kitchen.orderList.getDelivery()

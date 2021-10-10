@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 	"sync"
@@ -16,11 +15,10 @@ type ApparatusList struct {
 func (al *ApparatusList) getTimeLeft(now int64) int {
 	minWait := math.MaxInt32
 	for i, _ := range al.list {
-		appa := al.list[i].getValues()
-		if appa.busy == 0 {
+		timeLeft := al.list[i].getTimeLeft(now)
+		if timeLeft == 0 {
 			return 0
 		}
-		timeLeft := appa.meal.getTimeLeft(now)
 		if minWait > timeLeft {
 			minWait = timeLeft
 		}
@@ -37,7 +35,7 @@ func newApparatus(numOfApparatus int) *ApparatusList {
 	return ret
 }
 
-func (al *ApparatusList) useApparatus(cook *Cook, meal *Meal, now int64) {
+func (al *ApparatusList) getApparatusAndWait(now int64) (*Apparatus, int) {
 
 
 	al.listMutex.Lock()
@@ -45,26 +43,21 @@ func (al *ApparatusList) useApparatus(cook *Cook, meal *Meal, now int64) {
 	minWait := math.MaxInt32
 
 	//Get the first oven to finish
-	for i, _ := range al.list {
-		loopAppa := al.list[i]
-		if loopAppa.busy == 0 {
+	for _, loopAppa := range al.list {
+		timeLeft := loopAppa.getTimeLeft(now)
+		if timeLeft == 0 {
 			minWait = 0
-			appa = loopAppa
+			appa = loopAppa.getValues()
 			break
 		}
-		timeLeft := loopAppa.meal.getTimeLeft(now)
 		if minWait > timeLeft {
 			minWait = timeLeft
-			appa = loopAppa
+			appa = loopAppa.getValues()
 		}
 	}
-	if appa.busy == 1 {
-		fmt.Println("THE APPARATUS IS BUSY BRUH")
-	} //TODO check state of the cook, when the apparatus is busy, the time left goes negative, because he needs to wait for the apparatus to finish
 	al.listMutex.Unlock()
 
-	appa.useApparatus(cook,meal,now)
-
+	return appa, minWait
 }
 
 func (al *ApparatusList) getStatus() string {
