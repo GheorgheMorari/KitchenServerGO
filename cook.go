@@ -47,7 +47,7 @@ func (c *Cook) startWorking() {
 	for c.atWork == 1 {
 		meal := kitchen.orderList.getMeal(c)
 		if meal != nil {
-			now := time.Now().Unix()
+			now := getUnixTimeUnits()
 			c.statusId = 1
 			c.orderId = meal.parent.id
 			c.foodId = meal.foodId
@@ -93,7 +93,7 @@ func (c *Cook) getStatus() string {
 		if c.apparatusType != 0 {
 			ret += " using " + idToApparatus[c.apparatusType]
 		}
-		ret += " time left:" +strconv.Itoa(c.timeRequired - int(time.Now().Unix() - c.timeStarted))
+		ret += " time left:" +strconv.Itoa(c.timeRequired - int(getUnixTimeUnits() - c.timeStarted))
 	}
 
 	return ret

@@ -4,7 +4,6 @@ import (
 	"math"
 	"strconv"
 	"sync"
-	"time"
 )
 
 func removeFromArr(arr *[]*Meal, ptr *Meal) {
@@ -85,7 +84,7 @@ func (orderList *OrderList) getMeal(cook *Cook) *Meal {
 	orderList.mealMutex.Lock()
 	defer orderList.mealMutex.Unlock()
 
-	now := time.Now().Unix()
+	now := getUnixTimeUnits()
 	overallMin := math.MaxInt64
 	var ret *Meal //TODO make higher rank cooks take the higher orders first
 	ovenTimeLeft := kitchen.ovens.getTimeLeft(now)
@@ -131,7 +130,7 @@ func (orderList *OrderList) getMeal(cook *Cook) *Meal {
 func (orderList *OrderList) getStatus() string {
 	var ret string
 
-	now := time.Now().Unix() //TODO show status with buffered spaces
+	now := getUnixTimeUnits() //TODO show status with buffered spaces
 	for _, order := range orderList.orderArr {
 		ret += makeDiv("Order id:" + strconv.Itoa(order.id) + " Meals to prepare:" + strconv.Itoa(int(order.mealCounter)) +
 			" Time passed:" + strconv.Itoa(int(now-order.pickUpTime)) + " Max wait:" + strconv.Itoa(order.maxWait))
