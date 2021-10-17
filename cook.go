@@ -77,7 +77,7 @@ func (c *Cook) startWorking() {
 		if meal == nil && delivery == nil {
 			//Sleep for one second when there is nothing to do
 			c.statusId = 0
-			time.Sleep(time.Second)
+			time.Sleep(timeUnit)
 		}
 	}
 }

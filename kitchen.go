@@ -28,7 +28,7 @@ func (k *Kitchen) tryConnectDiningHall() {
 			k.connectionSuccessful()
 			break
 		} else {
-			time.Sleep(time.Second)
+			time.Sleep(timeUnit)
 		}
 	}
 }

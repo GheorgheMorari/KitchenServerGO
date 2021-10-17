@@ -1,15 +1,20 @@
 package main
 
-import "os"
+import (
+	"os"
+	"time"
+)
 
 var diningHallHost = "http://localhost"
 
 const diningHallPort = ":7500"
 const kitchenServerPort = ":8000"
-//todo fix multiple delivery problemd
+//todo fix multiple delivery problem
 const cookN = 4
 const ovenN = 2
 const stoveN = 1
+
+const timeUnit = time.Second
 
 var kitchen Kitchen
 func main() {
