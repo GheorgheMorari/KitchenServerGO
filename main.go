@@ -18,8 +18,10 @@ const orderListMaxSize = 2
 const timeUnit = 100 * time.Millisecond
 
 var kitchen Kitchen
+
 func main() {
-	if args := os.Args; len(args) > 1{
+	rand.Seed(69)
+	if args := os.Args; len(args) > 1 {
 		//Set the docker internal host
 		diningHallHost = args[1]
 	}
