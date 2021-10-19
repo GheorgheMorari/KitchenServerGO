@@ -26,6 +26,7 @@ type OrderList struct {
 	stoveList     []*Meal
 	nilList       []*Meal
 	orderArr      []*Order
+	maxLen        int
 }
 
 func getPriority(meal *Meal, timeLeft int) float64 {
@@ -43,10 +44,16 @@ func NewOrderList() *OrderList {
 	ret.stoveList = []*Meal{}
 	ret.nilList = []*Meal{}
 	ret.orderArr = []*Order{}
+	ret.maxLen = orderListMaxSize
 	return ret
 }
 
-func (orderList *OrderList) addOrder(order *Order) {
+func (orderList *OrderList) addOrder(order *Order) bool {
+	orderList.deliveryMutex.Lock()
+	defer orderList.deliveryMutex.Unlock()
+	if len(orderList.orderArr) > orderList.maxLen{
+		return false
+	}
 	orderList.orderArr = append(orderList.orderArr, order)
 	for _, meal := range order.mealList {
 		apparatusId := meal.apparatus
@@ -59,6 +66,7 @@ func (orderList *OrderList) addOrder(order *Order) {
 			orderList.stoveList = append(orderList.stoveList, meal)
 		}
 	}
+	return true
 }
 
 func (orderList *OrderList) getDelivery() *Delivery {

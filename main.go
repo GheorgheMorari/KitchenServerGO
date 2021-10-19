@@ -9,12 +9,13 @@ var diningHallHost = "http://localhost"
 
 const diningHallPort = ":7500"
 const kitchenServerPort = ":8000"
+
 const cookN = 4
 const ovenN = 2
 const stoveN = 1
+const orderListMaxSize = 2
 
-
-const timeUnit = time.Second
+const timeUnit = 100 * time.Millisecond
 
 var kitchen Kitchen
 func main() {
