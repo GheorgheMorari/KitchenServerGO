@@ -32,11 +32,6 @@ func (k *Kitchen) tryConnectDiningHall() {
 		}
 	}
 }
-
-func (k *Kitchen) deliver(delivery *Delivery) {
-	k.kitchenWeb.deliver(delivery)
-}
-
 func (k *Kitchen) connectionSuccessful() {
 	if k.connected {
 		return

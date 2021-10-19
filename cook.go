@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strconv"
 	"sync/atomic"
 	"time"
@@ -59,20 +60,26 @@ func (c *Cook) startWorking() {
 				meal.prepare(c, now)
 			case 1:
 				c.apparatusType = 1
-				apparatus , waitApparatus := kitchen.ovens.getApparatusAndWait(now)
+				apparatus, waitApparatus := kitchen.ovens.getApparatusAndWait(now)
 				c.timeRequired += waitApparatus
-				apparatus.useApparatus(c,meal,now)
+				apparatus.useApparatus(c, meal, now)
 			case 2:
 				c.apparatusType = 2
-				apparatus , waitApparatus := kitchen.stoves.getApparatusAndWait(now)
+				apparatus, waitApparatus := kitchen.stoves.getApparatusAndWait(now)
 				c.timeRequired += waitApparatus
-				apparatus.useApparatus(c,meal,now)
+				apparatus.useApparatus(c, meal, now)
 			}
 		}
 		delivery := kitchen.orderList.getDelivery()
 		if delivery != nil {
-			c.statusId = 2
-			kitchen.kitchenWeb.deliver(delivery)
+			success := false
+			for success == false {
+				c.statusId = 2
+				success = kitchen.kitchenWeb.deliver(delivery)
+				if success == false{
+					fmt.Println("OH NO")
+				}
+			}
 		}
 		if meal == nil && delivery == nil {
 			//Sleep for one second when there is nothing to do
@@ -93,7 +100,7 @@ func (c *Cook) getStatus() string {
 		if c.apparatusType != 0 {
 			ret += " using " + idToApparatus[c.apparatusType]
 		}
-		ret += " time left:" +strconv.Itoa(c.timeRequired - int(getUnixTimeUnits() - c.timeStarted))
+		ret += " time left:" + strconv.Itoa(c.timeRequired-int(getUnixTimeUnits()-c.timeStarted))
 	}
 
 	return ret
