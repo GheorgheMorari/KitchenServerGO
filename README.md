@@ -20,6 +20,8 @@ run remove_docker_stuff.sh to remove docker image and container
 
 http://localhost:8000/ to check if the kitchen server is running, and to see the state of the kitchen
 
+The time left is most of the time broken because of the inclusion of parallel work from one cook.
+
 # Tunables:
 
 There are multiple tunables in this simulation.
