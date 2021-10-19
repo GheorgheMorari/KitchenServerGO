@@ -23,7 +23,7 @@ func (k *Kitchen) start() {
 
 func (k *Kitchen) tryConnectDiningHall() {
 	k.connected = false
-	for k.connected {
+	for !k.connected {
 		if k.kitchenWeb.establishConnection() {
 			k.connectionSuccessful()
 			break
