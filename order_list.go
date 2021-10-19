@@ -51,7 +51,7 @@ func NewOrderList() *OrderList {
 func (orderList *OrderList) addOrder(order *Order) bool {
 	orderList.deliveryMutex.Lock()
 	defer orderList.deliveryMutex.Unlock()
-	if len(orderList.orderArr) > orderList.maxLen{
+	if len(orderList.orderArr) >= orderList.maxLen{
 		return false
 	}
 	orderList.orderArr = append(orderList.orderArr, order)
